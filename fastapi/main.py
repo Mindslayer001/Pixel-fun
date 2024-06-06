@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
@@ -55,7 +56,7 @@ Guidelines:
     Options: Provide 4 different main points with minimal words as choices the main character can take at each key decision point, with each choice leading to a different continuation of the story.
     Next Story: Write a continuation of the story for each option.
     Image Prompt: Create a descriptive text that captures the scene in the story, which can be used to generate an AI image.
-    Ending: The story should end between 19 to 25 responses from the user. The story should always end meaningfully with a moral for children.
+    Ending: The story should always end meaningfully between 19 to 25 responses from the userwith a moral for children.  
     Strict JSON Output: Return only the JSON output without any additional text or explanations.''',
     },
     {
@@ -65,6 +66,20 @@ Guidelines:
 ]
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",  # Add the URL where your React app is hosted
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 def root():
