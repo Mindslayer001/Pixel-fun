@@ -21,28 +21,42 @@ message = [
 
 Use the following JSON format for your output:
 
+json
+
 {
-    "narration": "story text here",
-    "options": ["option 1", "option 2"],
-    "image_prompt": "text to generate the image"
+  "question": "Question text here",
+  "options": [
+    { "choice": "Option 1 text", "nextStory": "Continuation of the story based on option 1" },
+    { "choice": "Option 2 text", "nextStory": "Continuation of the story based on option 2" },
+    { "choice": "Option 3 text", "nextStory": "Continuation of the story based on option 3" },
+    { "choice": "Option 4 text", "nextStory": "Continuation of the story based on option 4" }
+  ],
+  "image_prompt": "Text to generate the image"
 }
 
 Here’s an example output:
 
+json
+
 {
-    "narration": "Once upon a time in a magical forest, a young fox named Finn found a mysterious map. The map hinted at a hidden treasure. As Finn followed the map, he arrived at a fork in the road.",
-    "options": ["Follow the left path towards the dark forest", "Take the right path towards the sunny meadow", "Climb the hill to get a better view"],
-    "image_prompt": "A young fox holding a map, standing at a fork in the road with one path leading to a dark forest and the other to a sunny meadow."
+  "question": "What was the knight seeking?",
+  "options": [
+    { "choice": "A magical sword", "nextStory": "The knight discovered the ancient sword hidden deep within the enchanted forest." },
+    { "choice": "A legendary treasure", "nextStory": "The knight embarked on a perilous journey to uncover the mythical treasure of the ancient kings." },
+    { "choice": "A dragon to slay", "nextStory": "The knight faced the mighty dragon in a fierce battle to protect the kingdom from its wrath." },
+    { "choice": "A lost kingdom", "nextStory": "The knight ventured into the unknown, seeking the lost kingdom of his ancestors." }
+  ],
+  "image_prompt": "A brave knight in shining armor, standing at the edge of an enchanted forest, holding a map with various paths leading to different adventures."
 }
 
 Guidelines:
 
-Story: Write a short, engaging, and age-appropriate narrative for children.
-Key Points: Introduce key decision points where the main character must choose between different actions.
-Options: Provide 3 different actions the main character can take at each key decision point.
-Image Prompt: Create a descriptive text that captures the scene in the story, which can be used to generate an AI image.
-Ending: The story should end between 10 to 15 responses from the user. The story should always end with a moral for children.
-Strict JSON Output: Return only the JSON output without any additional text or explanations.''',
+    Question: Frame a question based on the current scenario in the story.
+    Options: Provide 4 different main points with minimal words as choices the main character can take at each key decision point, with each choice leading to a different continuation of the story.
+    Next Story: Write a continuation of the story for each option.
+    Image Prompt: Create a descriptive text that captures the scene in the story, which can be used to generate an AI image.
+    Ending: The story should end between 19 to 25 responses from the user. The story should always end meaningfully with a moral for children.
+    Strict JSON Output: Return only the JSON output without any additional text or explanations.''',
     },
     {
         "role": "user",
@@ -71,7 +85,7 @@ def root():
 
         data = json.loads(content)
 
-        narration = data['narration']
+        narration = data['question']
         options = data['options']
         image_prompt = data['image_prompt']
 
@@ -101,7 +115,7 @@ def set_option(option: str = Query(...)):
 
         data = json.loads(content)
 
-        narration = data['narration']
+        narration = data['question']
         options = data['options']
         image_prompt = data['image_prompt']
 
