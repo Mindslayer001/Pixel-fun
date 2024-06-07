@@ -3,42 +3,53 @@ import './App.css';
 
 const App = () => {
   const [story, setStory] = useState('');
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [question, setQuestion] = useState('');
   const [options, setOptions] = useState([]);
-
-  const storyText = "Once upon a time in a faraway land, there was a brave knight who sought to find a legendary treasure...";
-
-  const questions = [
-    {
-      question: "What was the knight seeking?",
-      options: [
-        { text: "A magical sword", nextStory: "The knight discovered the ancient sword hidden deep within the enchanted forest." },
-        { text: "A legendary treasure", nextStory: "The knight embarked on a perilous journey to uncover the mythical treasure of the ancient kings." },
-        { text: "A dragon to slay", nextStory: "The knight faced the mighty dragon in a fierce battle to protect the kingdom from its wrath." },
-        { text: "A lost kingdom", nextStory: "The knight ventured into the unknown, seeking the lost kingdom of his ancestors." }
-      ]
-    }
-  ];
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
-    setStory(storyText);
-
-   
-    const timer = setTimeout(() => {
-      setCurrentQuestion(questions[0]);
-      setOptions(questions[0].options);
-      setStory(null);  
-    }, 8000);
-
-    
-    return () => clearTimeout(timer);
+    fetchStory();
   }, []);
+
+  const fetchStory = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/');
+      const data = await response.json();
+      console.log('Fetched data:', data);
+      setStory(data.narration);
+      setQuestion(data.question);
+      setOptions(data.options);
+    } catch (error) {
+      console.error('Error fetching story:', error);
+    }
+  };
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
-    setStory(option.nextStory);
-    setCurrentQuestion(null);
+  };
+
+  const handleConfirm = async () => {
+    if (selectedOption) {
+      try {
+        const response = await fetch(`http://localhost:8000/options?option=${encodeURIComponent(selectedOption.choice)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        console.log('Response after selecting option:', data);
+        setStory(data.narration);
+        setQuestion(data.question);
+        setOptions(data.options);
+        setSelectedOption(null); // Reset the selected option
+      } catch (error) {
+        console.error('Error selecting option:', error);
+      } finally {
+        setConfirmed(false); // Reset the confirmation state after updating the story
+      }
+    }
   };
 
   return (
@@ -50,14 +61,29 @@ const App = () => {
           </header>
         </div>
       )}
-      {currentQuestion && (
+      {question && !confirmed && (
         <div className="question-container">
-          <h2>{currentQuestion.question}</h2>
+          <h2>{question}</h2>
           <ul>
             {options.map((option, index) => (
-              <li key={index} onClick={() => handleOptionSelect(option)}>{option.text}</li>
+              <li key={index} onClick={() => handleOptionSelect(option)}>
+                {option.choice}
+              </li>
             ))}
           </ul>
+        </div>
+      )}
+      {selectedOption && !confirmed && (
+        <div className="confirmation-container">
+          <h2>You selected: {selectedOption.choice}</h2>
+          <button onClick={() => setConfirmed(true)}>Confirm</button>
+        </div>
+      )}
+      {confirmed && (
+        <div className="confirmation-container">
+          <h2>Are you sure you want to proceed with this choice?</h2>
+          <button onClick={handleConfirm}>Yes</button>
+          <button onClick={() => setConfirmed(false)}>No</button>
         </div>
       )}
     </div>
@@ -65,3 +91,6 @@ const App = () => {
 };
 
 export default App;
+
+
+
