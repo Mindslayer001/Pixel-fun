@@ -6,6 +6,8 @@ import json
 
 # Assuming you have the correct import for Groq client
 from groq import Groq
+from fastapi import FastAPI
+app = FastAPI()
 
 load_dotenv()
 api_key = os.getenv("STORY_API")
