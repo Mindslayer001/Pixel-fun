@@ -5,31 +5,6 @@ import os
 import json
 from components import *
 from groq import Groq
-#import replicate
-
-
-
-
-def generate_image(text):
-    input = {
-        "width": 1920,
-        "height": 1080,
-        "prompt": text,
-        "refine": "expert_ensemble_refiner",
-        "apply_watermark": False,
-        "num_inference_steps": 25
-    }
-
-    output = replicate.run(
-        "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-        input=input
-    )
-    print(output)
-    return output[-1]
-
-
-
-
 
 
 app = FastAPI()
@@ -81,7 +56,7 @@ def root(theme : str = Query(...)):
     try:
         completion = client.chat.completions.create(
             model="llama3-8b-8192",
-            messages=start,
+            messages=start+message,
             temperature=1,
             max_tokens=1024,
             top_p=1,
@@ -100,11 +75,9 @@ def root(theme : str = Query(...)):
         options = data['options']
         print(options)
         image_prompt = data['image_prompt']
-        print("Image is being generated")
-        # url = generate_image(image_prompt)
+                
 
         return {"narration": narration, "question": question, "options": options, "image_prompt": image_prompt}
-        # return {"narration": narration, "question": question, "options": options, "image_url": url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
