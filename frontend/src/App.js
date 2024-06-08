@@ -17,13 +17,18 @@ const App = () => {
 
   useEffect(() => {
     if (theme) {
-      fetchStory();
+      fetchStory(theme);
     }
   }, [theme]);
 
-  const fetchStory = async () => {
+  const fetchStory = async (theme) => {
     try {
-      const response = await fetch('http://localhost:8000/');
+      const response = await fetch(`http://localhost:8000/themes?theme=${encodeURIComponent(theme)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
       const data = await response.json();
       console.log('Fetched data:', data);
       setStory(data.narration);
@@ -41,6 +46,7 @@ const App = () => {
   const handleConfirm = async () => {
     if (selectedOption) {
       try {
+        const prevSelectedOption = selectedOption.choice; // Store the selected option
         const response = await fetch(`http://localhost:8000/options?option=${encodeURIComponent(selectedOption.choice)}`, {
           method: 'POST',
           headers: {
@@ -53,19 +59,19 @@ const App = () => {
         setQuestion(data.question);
         setOptions(data.options);
         setSelectedOption(null);
+        setConfirmed(false); // Reset the confirmed state
+        setStory(prevStory => `${prevStory} You selected: ${prevSelectedOption}`); // Display the selected option along with the next narration and question
       } catch (error) {
         console.error('Error selecting option:', error);
-      } finally {
-        setConfirmed(false);
       }
     }
   };
 
   const themeOptions = [
-    { name: 'Forest', image: forestImg },
-    { name: 'Evil & Good', image: evilGoodImg },
-    { name: 'Family & Friends', image: familyFriendsImg },
-    { name: 'Adventure', image: adventureImg }
+    { name: 'forest', image: forestImg },
+    { name: 'evil & Good', image: evilGoodImg },
+    { name: 'family & Friends', image: familyFriendsImg },
+    { name: 'adventure', image: adventureImg }
   ];
 
   if (!theme) {
@@ -115,9 +121,10 @@ const App = () => {
       )}
       {selectedOption && !confirmed && (
         <div className="confirmation-container">
-          <h2>You selected: {selectedOption.choice}</h2>
+          <h2><b>You selected: </b>{selectedOption.choice}</h2>
           <button onClick={() => setConfirmed(true)}>Confirm</button>
         </div>
+
       )}
       {confirmed && (
         <div className="confirmation-container">
@@ -131,5 +138,3 @@ const App = () => {
 };
 
 export default App;
-
-
