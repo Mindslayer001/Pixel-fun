@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import background from './background.webp';
+import backgroundVideo from './bg.mp4';
+import forestImg from './forest.jpg.avif';
+import evilGoodImg from './evilgood.jpg.webp';
+import familyFriendsImg from './family.jpg';
+import adventureImg from './adventure.jpg';
 
 const App = () => {
+  const [theme, setTheme] = useState(null);
   const [story, setStory] = useState('');
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState([]);
@@ -9,8 +16,10 @@ const App = () => {
   const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
-    fetchStory();
-  }, []);
+    if (theme) {
+      fetchStory();
+    }
+  }, [theme]);
 
   const fetchStory = async () => {
     try {
@@ -43,17 +52,48 @@ const App = () => {
         setStory(data.narration);
         setQuestion(data.question);
         setOptions(data.options);
-        setSelectedOption(null); // Reset the selected option
+        setSelectedOption(null);
       } catch (error) {
         console.error('Error selecting option:', error);
       } finally {
-        setConfirmed(false); // Reset the confirmation state after updating the story
+        setConfirmed(false);
       }
     }
   };
 
+  const themeOptions = [
+    { name: 'Forest', image: forestImg },
+    { name: 'Evil & Good', image: evilGoodImg },
+    { name: 'Family & Friends', image: familyFriendsImg },
+    { name: 'Adventure', image: adventureImg }
+  ];
+
+  if (!theme) {
+    return (
+      <div className="App">
+        <video autoPlay loop muted className="video-background">
+          <source src={backgroundVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="video-overlay">
+          <div className="theme-selection-container">
+            <h1>Choose a Theme</h1>
+            <ul className="theme-options">
+              {themeOptions.map((themeOption, index) => (
+                <li key={index} onClick={() => setTheme(themeOption.name)} className="theme-option">
+                  <img src={themeOption.image} alt={themeOption.name} className="theme-image" />
+                  <p>{themeOption.name}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="App">
+    <div className="App" style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '100vh', width: '100%' }}>
       {story && (
         <div className="story-container">
           <header className="App-header">
@@ -61,7 +101,7 @@ const App = () => {
           </header>
         </div>
       )}
-      {question && !confirmed && (
+      {question && (
         <div className="question-container">
           <h2>{question}</h2>
           <ul>
@@ -91,6 +131,5 @@ const App = () => {
 };
 
 export default App;
-
 
 
