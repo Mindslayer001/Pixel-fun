@@ -1,0 +1,3 @@
+fastapi==0.111.0
+groq==0.8.0
+uvicorn==0.30.1
