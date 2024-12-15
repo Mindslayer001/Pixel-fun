@@ -12,7 +12,6 @@ app = FastAPI()
 load_dotenv()
 api_key = os.getenv("STORY_API")
 
-
 if api_key is None:
     raise ValueError("API key not found in environment variables")
 
@@ -31,26 +30,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
-def imgGen(text):
-    input = {
-        "width": 1920,
-        "height": 1080,
-        "prompt": text,
-        "refine": "expert_ensemble_refiner",
-        "apply_watermark": False,
-        "num_inference_steps": 25
-    }
-
-    try:
-        # Call the replicate API
-        output = replicate.run(
-            "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-            input=input
-        )
-        return output
-    except Exception as e:
-        # Handle exceptions
-        raise HTTPException(status_code=500, detail=str(e))
 
 interaction = 0
 message = []
@@ -84,9 +63,8 @@ def root(theme: str = Query(...)):
         options = data['options']
         print(options)
         image_prompt = data['image_prompt']
-        print("into image")
-        image = imgGen(image_prompt)
-        print(image)
+        image = "https://img.freepik.com/free-vector/vector-damask-seamless-pattern-background-classical-luxury-old-fashioned-damask-ornament-royal-victorian-seamless-texture-wallpapers-textile-wrapping-exquisite-floral-baroque-template_1217-738.jpg?t=st=1734157306~exp=1734160906~hmac=1c58820dc83f60a3235f0fcb229637c01b256a310c592ae05500154c5ac820dd&w=740"
+
         return {"narration": narration, "question": question, "options": options, "image": image}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -117,7 +95,8 @@ def end_story(option):
         question = data['question']
         options = data['options']
         image_prompt = data['image_prompt']
-        image = imgGen(image_prompt)
+        image = "https://img.freepik.com/free-vector/vector-damask-seamless-pattern-background-classical-luxury-old-fashioned-damask-ornament-royal-victorian-seamless-texture-wallpapers-textile-wrapping-exquisite-floral-baroque-template_1217-738.jpg?t=st=1734157306~exp=1734160906~hmac=1c58820dc83f60a3235f0fcb229637c01b256a310c592ae05500154c5ac820dd&w=740"
+
 
         return {"narration": narration, "question": question, "options": options, "image": image}
     except Exception as e:
@@ -153,7 +132,8 @@ def set_option(option: str = Query(...)):
         question = data['question']
         options = data['options']
         image_prompt = data['image_prompt']
-        image = imgGen(image_prompt)
+        image = "https://img.freepik.com/free-vector/vector-damask-seamless-pattern-background-classical-luxury-old-fashioned-damask-ornament-royal-victorian-seamless-texture-wallpapers-textile-wrapping-exquisite-floral-baroque-template_1217-738.jpg?t=st=1734157306~exp=1734160906~hmac=1c58820dc83f60a3235f0fcb229637c01b256a310c592ae05500154c5ac820dd&w=740"
+
         return {"narration": narration, "question": question, "options": options, "image": image}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
